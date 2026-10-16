@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediaPipe 手势小游戏</title>
+  <!-- 引入赛博霓虹风格 -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="app">
+    <!-- 主菜单 -->
+    <div id="menu-screen" class="screen">
+      <div class="neon-title">✋ 手势星际收集者</div>
+      <p class="subtitle">举起一只手，用食指指尖控制霓虹飞船</p>
+      <button id="menu-start-btn" class="neon-btn">开始游戏</button>
+      <div class="hint">按 <kbd>空格</kbd> 可暂停 · <kbd>ESC</kbd> 返回菜单</div>
+    </div>
+
+    <!-- 模式选择 -->
+    <div id="mode-screen" class="screen hidden">
+      <h2 class="neon-heading">选择模式</h2>
+      <div id="mode-buttons" class="btn-grid"></div>
+      <button id="mode-back-btn" class="ghost-btn">返回菜单</button>
+    </div>
+
+    <!-- 难度选择 -->
+    <div id="difficulty-screen" class="screen hidden">
+      <h2 class="neon-heading">选择难度</h2>
+      <div id="difficulty-buttons" class="btn-grid"></div>
+      <button id="diff-back-btn" class="ghost-btn">返回模式</button>
+    </div>
+
+    <!-- 游戏进行界面 -->
+    <div id="game-screen" class="screen hidden">
+      <!-- 摄像头小窗口 -->
+      <video id="input-video" class="input-video" playsinline></video>
+
+      <!-- HUD -->
+      <div id="hud">
+        <div class="hud-item">
+          <span class="hud-icon">♥</span>
+          <span id="hud-lives">♥♥♥</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-icon">★</span>
+          <span id="hud-score">0</span>
+        </div>
+        <div class="hud-item combo-box">
+          <span class="hud-icon">⚡</span>
+          <span id="hud-combo">0</span>
+          <div class="combo-bar-wrap">
+            <div id="combo-bar"></div>
+          </div>
+        </div>
+        <div class="hud-item">
+          <span class="hud-icon">🏆</span>
+          <span id="hud-max-combo">0</span>
+        </div>
+        <div class="hud-item mode-tag">
+          <span id="hud-mode">经典</span>
+          <span id="hud-difficulty">中等</span>
+        </div>
+        <div id="hud-time" class="hud-item hidden">⏱ 60.0s</div>
+      </div>
+
+      <button id="pause-btn" class="hud-btn">暂停</button>
+      <button id="zen-end-btn" class="hud-btn hidden">结束放松</button>
+
+      <!-- 画布与覆盖层 -->
+      <div id="game-canvas-wrapper">
+        <canvas id="game-canvas"></canvas>
+
+        <div id="countdown-overlay" class="overlay hidden">3</div>
+
+        <div id="pause-overlay" class="overlay hidden">
+          <div class="pause-content">
+            <h2>游戏暂停</h2>
+            <p>按空格键或点击继续</p>
+            <button id="resume-btn" class="neon-btn">继续游戏</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 结算界面 -->
+    <div id="result-screen" class="screen hidden">
+      <div class="result-card">
+        <h2 class="neon-heading">游戏结束</h2>
+        <div class="result-grid">
+          <div class="result-item">
+            <span class="result-label">模式</span>
+            <span id="result-mode" class="result-value">经典</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">难度</span>
+            <span id="result-difficulty" class="result-value">中等</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">得分</span>
+            <span id="result-score" class="result-value">0</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">最高连击</span>
+            <span id="result-combo" class="result-value">0</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">存活时间</span>
+            <span id="result-time" class="result-value">0</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">模式最高分</span>
+            <span id="result-high-score" class="result-value">0</span>
+          </div>
+        </div>
+        <p id="result-feedback">正在请 AI 裁判点评...</p>
+        <div class="result-actions">
+          <button id="result-restart-btn" class="neon-btn">再来一局</button>
+          <button id="result-menu-btn" class="ghost-btn">返回菜单</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MediaPipe 官方 CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+
+  <!-- 拆分后的前端模块 -->
+  <script src="js/audio.js"></script>
+  <script src="js/storage.js"></script>
+  <script src="js/pointer.js"></script>
+  <script src="js/ui.js"></script>
+  <script src="js/game.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
