@@ -264,6 +264,19 @@ button {
 #hud-combo {
   color: var(--neon-yellow);
   font-weight: bold;
+  display: inline-block;
+  transition: color 0.3s ease;
+}
+
+#hud-combo.combo-pop {
+  animation: comboPop 0.5s ease;
+}
+
+@keyframes comboPop {
+  0% { transform: scale(1) rotate(0deg); }
+  35% { transform: scale(2.1) rotate(-6deg); }
+  70% { transform: scale(1.3) rotate(5deg); }
+  100% { transform: scale(1) rotate(0deg); }
 }
 
 .combo-bar-wrap {
@@ -332,6 +345,45 @@ button {
   object-fit: cover;
   border: 1px solid rgba(56, 189, 248, 0.4);
   box-shadow: 0 0 12px rgba(56, 189, 248, 0.2);
+  z-index: 30;
+  pointer-events: none;
+}
+
+/* 手势识别测试提示 */
+#gesture-debug {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 999;
+  padding: 8px 16px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: var(--neon-yellow);
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(250, 204, 21, 0.5);
+  border-radius: 10px;
+  box-shadow: 0 0 15px rgba(250, 204, 21, 0.3);
+  pointer-events: none;
+}
+
+/* 摄像头错误提示（居中红字） */
+#camera-error {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1000;
+  padding: 20px 28px;
+  font-size: 1.25rem;
+  font-weight: bold;
+  color: #fff;
+  background: rgba(127, 29, 29, 0.95);
+  border: 2px solid var(--neon-red);
+  border-radius: 12px;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.6);
+  max-width: 90vw;
+  text-align: center;
+  line-height: 1.6;
 }
 
 /* 覆盖层 */
@@ -371,6 +423,32 @@ button {
 .pause-content h2 {
   color: var(--neon-pink);
   margin-bottom: 10px;
+}
+
+/* ===== 过关结算面板（魔法手势师） ===== */
+#level-clear-overlay {
+  background: rgba(5, 5, 16, 0.88);
+  flex-direction: column;
+  gap: 16px;
+}
+
+.level-clear-panel {
+  text-align: center;
+  padding: 24px;
+}
+
+.level-clear-panel h2 {
+  font-size: 2rem;
+  color: var(--neon-yellow);
+  text-shadow: 0 0 12px rgba(250, 204, 21, 0.7);
+  margin-bottom: 8px;
+}
+
+.level-clear-actions {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 8px;
 }
 
 /* 结算卡片 */
@@ -420,10 +498,145 @@ button {
   line-height: 1.5;
 }
 
+/* ===== 手势失误柱状图（魔法手势师结算页） ===== */
+#gesture-chart {
+  margin: 4px 0 12px;
+  text-align: left;
+}
+
+#gesture-chart h3 {
+  font-size: 1rem;
+  color: var(--neon-blue);
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.chart-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+}
+
+.chart-label {
+  width: 72px;
+  flex-shrink: 0;
+  color: #e2e8f0;
+  text-align: right;
+}
+
+.chart-track {
+  flex: 1;
+  height: 16px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.chart-fill {
+  height: 100%;
+  width: 0%;
+  border-radius: 8px;
+  background: linear-gradient(90deg, var(--neon-red), var(--neon-pink));
+  transition: width 0.6s ease;
+}
+
+.chart-count {
+  width: 36px;
+  flex-shrink: 0;
+  color: var(--neon-yellow);
+  font-weight: bold;
+  text-align: left;
+}
+
+.chart-summary {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #94a3b8;
+  text-align: center;
+}
+
 .result-actions {
   display: flex;
   justify-content: center;
   gap: 16px;
+}
+
+/* ===== 关卡选择界面（魔法手势师） ===== */
+.level-select-panel {
+  background: var(--panel-bg);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  border-radius: 20px;
+  padding: 32px 42px;
+  box-shadow: 0 0 40px rgba(56, 189, 248, 0.2);
+  backdrop-filter: blur(6px);
+  max-width: 640px;
+  width: 100%;
+}
+
+.level-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+  margin: 20px 0;
+}
+
+.level-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 12px;
+  font-size: 1rem;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  color: #fff;
+  border-radius: 14px;
+  box-shadow: 0 0 12px rgba(56, 189, 248, 0.1);
+}
+
+.level-btn strong {
+  font-size: 1.1rem;
+  color: var(--neon-blue);
+}
+
+.level-btn span {
+  font-size: 0.8rem;
+  color: #94a3b8;
+}
+
+.level-btn:hover:not(.locked):not(:disabled) {
+  transform: translateY(-4px);
+  border-color: var(--neon-pink);
+  box-shadow: 0 0 25px rgba(244, 114, 182, 0.4);
+}
+
+.level-btn-tutorial {
+  border-color: rgba(56, 189, 248, 0.6);
+}
+
+.level-btn-boss {
+  border-color: rgba(239, 68, 68, 0.5);
+  box-shadow: 0 0 14px rgba(239, 68, 68, 0.15);
+}
+
+.level-btn-boss strong {
+  color: var(--neon-red);
+}
+
+.level-btn.locked,
+.level-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.4;
+  filter: grayscale(0.6);
+  border-color: rgba(148, 163, 184, 0.3);
+  box-shadow: none;
+}
+
+.level-btn.locked strong,
+.level-btn:disabled strong {
+  color: #64748b;
 }
 
 /* 响应式 */
@@ -431,5 +644,113 @@ button {
   .neon-title { font-size: 2.2rem; }
   .btn-grid { grid-template-columns: 1fr; }
   .result-grid { grid-template-columns: repeat(2, 1fr); }
+  .level-grid { grid-template-columns: repeat(2, 1fr); }
   #hud { font-size: 0.85rem; gap: 8px; }
+}
+
+/* ===== 手势识别状态 HUD（魔法手势师） ===== */
+#gesture-hud {
+  position: absolute;
+  top: 64px;
+  right: 16px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  background: var(--panel-bg);
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.15);
+  backdrop-filter: blur(4px);
+  min-width: 110px;
+}
+
+.gesture-info {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.gesture-name {
+  font-size: 1.15rem;
+  font-weight: bold;
+  color: var(--neon-blue);
+  text-shadow: 0 0 8px rgba(56, 189, 248, 0.7);
+}
+
+.gesture-conf {
+  font-size: 0.85rem;
+  color: var(--neon-yellow);
+}
+
+.cooldown-wrap {
+  position: relative;
+  width: 44px;
+  height: 44px;
+}
+
+.cooldown-ring {
+  width: 44px;
+  height: 44px;
+  transform: rotate(-90deg); /* 从顶部开始 */
+}
+
+.cooldown-ring .cd-bg {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 3;
+}
+
+.cooldown-ring .cd-fg {
+  fill: none;
+  stroke: var(--neon-yellow);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-dasharray: 0 100;
+  transition: stroke-dasharray 0.1s linear;
+}
+
+.cooldown-label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: var(--neon-yellow);
+  pointer-events: none;
+}
+
+/* ===== 施法成功/失败提示大字 ===== */
+#cast-popup {
+  position: absolute;
+  top: 30%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 20;
+  font-size: 3rem;
+  font-weight: bold;
+  pointer-events: none;
+  white-space: nowrap;
+  text-shadow: 0 0 24px rgba(255, 255, 255, 0.6);
+}
+
+#cast-popup.success {
+  color: var(--neon-yellow);
+  animation: castPopup 0.5s ease forwards;
+}
+
+#cast-popup.fail {
+  color: var(--neon-red);
+  text-shadow: 0 0 24px rgba(239, 68, 68, 0.8);
+  animation: castPopup 0.5s ease forwards;
+}
+
+@keyframes castPopup {
+  0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.4); }
+  30%  { opacity: 1; transform: translate(-50%, -50%) scale(1.25); }
+  60%  { transform: translate(-50%, -50%) scale(1.0); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
 }

@@ -9,6 +9,9 @@
 </head>
 <body>
   <div id="app">
+    <!-- 摄像头小窗口：放在所有 screen 之外，避免 display:none 导致视频无法播放 -->
+    <video id="input-video" class="input-video" autoplay muted playsinline></video>
+
     <!-- 主菜单 -->
     <div id="menu-screen" class="screen">
       <div class="neon-title">✋ 手势星际收集者</div>
@@ -31,11 +34,18 @@
       <button id="diff-back-btn" class="ghost-btn">返回模式</button>
     </div>
 
+    <!-- 关卡选择（魔法手势师） -->
+    <div id="level-select-screen" class="screen hidden">
+      <div class="level-select-panel">
+        <h2 class="neon-heading">魔法手势师 · 关卡选择</h2>
+        <p class="hint">通关即可解锁下一关，进度自动保存</p>
+        <div id="level-buttons" class="level-grid"></div>
+        <button id="level-back-btn" class="ghost-btn">返回模式</button>
+      </div>
+    </div>
+
     <!-- 游戏进行界面 -->
     <div id="game-screen" class="screen hidden">
-      <!-- 摄像头小窗口 -->
-      <video id="input-video" class="input-video" playsinline></video>
-
       <!-- HUD -->
       <div id="hud">
         <div class="hud-item">
@@ -54,8 +64,12 @@
           </div>
         </div>
         <div class="hud-item">
-          <span class="hud-icon">🏆</span>
-          <span id="hud-max-combo">0</span>
+          <span class="hud-icon">🎯</span>
+          <span id="hud-accuracy">—</span>
+        </div>
+        <div class="hud-item">
+          <span class="hud-icon">⏱</span>
+          <span id="hud-reaction">—</span>
         </div>
         <div class="hud-item mode-tag">
           <span id="hud-mode">经典</span>
@@ -63,6 +77,24 @@
         </div>
         <div id="hud-time" class="hud-item hidden">⏱ 60.0s</div>
       </div>
+
+      <!-- 手势识别状态 HUD（仅魔法手势师显示） -->
+      <div id="gesture-hud" class="hidden">
+        <div class="gesture-info">
+          <span class="gesture-name" id="gesture-name">无</span>
+          <span class="gesture-conf" id="gesture-conf">0%</span>
+        </div>
+        <div class="cooldown-wrap" title="技能冷却">
+          <svg viewBox="0 0 36 36" class="cooldown-ring">
+            <circle class="cd-bg" cx="18" cy="18" r="15.915" />
+            <circle class="cd-fg" id="cooldown-fg" cx="18" cy="18" r="15.915" />
+          </svg>
+          <span class="cooldown-label">CD</span>
+        </div>
+      </div>
+
+      <!-- 施法成功/失败提示大字 -->
+      <div id="cast-popup" class="hidden"></div>
 
       <button id="pause-btn" class="hud-btn">暂停</button>
       <button id="zen-end-btn" class="hud-btn hidden">结束放松</button>
@@ -80,20 +112,31 @@
             <button id="resume-btn" class="neon-btn">继续游戏</button>
           </div>
         </div>
+
+        <div id="level-clear-overlay" class="overlay hidden">
+          <div class="level-clear-panel">
+            <h2 id="level-clear-title">过关成功！</h2>
+            <p id="level-clear-sub" class="hint">准备进入下一关</p>
+            <div class="level-clear-actions">
+              <button id="next-level-btn" class="neon-btn">下一关</button>
+              <button id="level-select-btn" class="ghost-btn">返回关卡选择</button>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 
     <!-- 结算界面 -->
     <div id="result-screen" class="screen hidden">
       <div class="result-card">
-        <h2 class="neon-heading">游戏结束</h2>
+        <h2 class="neon-heading" id="result-title">游戏结束</h2>
         <div class="result-grid">
           <div class="result-item">
             <span class="result-label">模式</span>
             <span id="result-mode" class="result-value">经典</span>
           </div>
           <div class="result-item">
-            <span class="result-label">难度</span>
+            <span class="result-label" id="result-difficulty-label">难度</span>
             <span id="result-difficulty" class="result-value">中等</span>
           </div>
           <div class="result-item">
@@ -105,14 +148,34 @@
             <span id="result-combo" class="result-value">0</span>
           </div>
           <div class="result-item">
+            <span class="result-label">击杀数</span>
+            <span id="result-kills" class="result-value">0</span>
+          </div>
+          <div class="result-item">
             <span class="result-label">存活时间</span>
             <span id="result-time" class="result-value">0</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label">施法准确率</span>
+            <span id="result-accuracy" class="result-value">—</span>
+          </div>
+          <div class="result-item">
+            <span class="result-label" id="result-reaction-label">平均反应</span>
+            <span id="result-reaction" class="result-value">—</span>
           </div>
           <div class="result-item">
             <span class="result-label">模式最高分</span>
             <span id="result-high-score" class="result-value">0</span>
           </div>
         </div>
+
+        <!-- 手势失误柱状图（仅魔法手势师显示） -->
+        <div id="gesture-chart" class="hidden">
+          <h3>手势失误分布</h3>
+          <div class="chart-bars"></div>
+          <p class="chart-summary"></p>
+        </div>
+
         <p id="result-feedback">正在请 AI 裁判点评...</p>
         <div class="result-actions">
           <button id="result-restart-btn" class="neon-btn">再来一局</button>
@@ -120,6 +183,12 @@
         </div>
       </div>
     </div>
+
+    <!-- 手势识别测试提示（左上角实时显示） -->
+    <div id="gesture-debug">手势: 无</div>
+
+    <!-- 摄像头错误提示（居中红字） -->
+    <div id="camera-error" class="hidden"></div>
   </div>
 
   <!-- MediaPipe 官方 CDN -->
@@ -134,6 +203,8 @@
   <script src="js/pointer.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/game.js"></script>
+  <script src="js/wizardGame.js"></script>
+  <script src="js/handGestures.js"></script>
   <script src="main.js"></script>
 </body>
 </html>

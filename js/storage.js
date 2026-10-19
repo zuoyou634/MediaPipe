@@ -28,5 +28,22 @@ const Storage = {
       zen: this.getHighScore('zen'),
       survival: this.getHighScore('survival')
     };
+  },
+
+  /** 魔法手势师：已解锁的最高关卡序号（1-5 普通关，6=Boss，教学关恒解锁） */
+  getWizardUnlockedLevel() {
+    const val = localStorage.getItem(`${this.keyPrefix}wizard_unlocked`);
+    const n = parseInt(val, 10);
+    if (!Number.isFinite(n)) return 1;
+    return Math.max(1, Math.min(6, n));
+  },
+
+  /** 记录通关后解锁到 nextLevelIndex 关（仅当比当前进度更靠后时才更新） */
+  setWizardUnlockedLevel(nextLevelIndex) {
+    const cur = this.getWizardUnlockedLevel();
+    const target = Math.max(1, Math.min(6, nextLevelIndex));
+    if (target > cur) {
+      localStorage.setItem(`${this.keyPrefix}wizard_unlocked`, target);
+    }
   }
 };
