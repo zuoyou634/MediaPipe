@@ -23,7 +23,6 @@ class WizardGame {
     this.lives = 5;
     this.combo = 0;
     this.maxCombo = 0;
-
     // 施法统计
     this.totalCasts = 0;
     this.correctCasts = 0;
@@ -535,7 +534,7 @@ class WizardGame {
     });
     this.ui.showScreen('result-screen');
 
-    fetch('/.netlify/functions/feedback', {
+    fetch('/api/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)

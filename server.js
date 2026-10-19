@@ -151,7 +151,7 @@ async function handleFeedback(req, res) {
   return res.status(200).json({ feedback });
 }
 
-// 本地开发用 /api/feedback；Netlify 部署后前端改用 /.netlify/functions/feedback
+// 本地开发与 Cloudflare Pages 部署统一走 /api/feedback
 app.post('/api/feedback', handleFeedback);
 app.post('/.netlify/functions/feedback', handleFeedback);
 

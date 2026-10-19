@@ -601,7 +601,7 @@ class Game {
     });
     this.ui.showScreen('result-screen');
 
-    fetch('/.netlify/functions/feedback', {
+    fetch('/api/feedback', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload)
