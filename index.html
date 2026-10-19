@@ -191,11 +191,9 @@
     <div id="camera-error" class="hidden"></div>
   </div>
 
-  <!-- MediaPipe 官方 CDN -->
-  <script src="https://jsd.cdn.zzko.cn/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-  <script src="https://jsd.cdn.zzko.cn/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
-  <script src="https://jsd.cdn.zzko.cn/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-  <script src="https://jsd.cdn.zzko.cn/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+  <!-- MediaPipe 本地依赖（wasm 目录） -->
+  <script src="./wasm/camera_utils.js"></script>
+  <script src="./wasm/hands.js"></script>
 
   <!-- 拆分后的前端模块 -->
   <script src="js/audio.js"></script>

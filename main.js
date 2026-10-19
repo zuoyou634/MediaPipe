@@ -93,11 +93,11 @@ if (typeof Hands === 'undefined' || typeof Camera === 'undefined') {
     errEl.textContent = '无法加载 MediaPipe 依赖（CDN 可能被拦截）。请检查网络，或按 F12 查看控制台错误。';
     errEl.classList.remove('hidden');
   }
-  throw new Error('MediaPipe 库未加载：请检查 jsd.cdn.zzko.cn 是否可访问');
+  throw new Error('MediaPipe 库未加载：请检查本地 wasm 文件夹是否存在');
 }
 
 const hands = new Hands({
-  locateFile: (file) => `https://jsd.cdn.zzko.cn/npm/@mediapipe/hands/${file}`
+  locateFile: (file) => `./wasm/${file}`
 });
 
 hands.setOptions({
