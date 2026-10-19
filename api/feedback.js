@@ -1,25 +1,36 @@
 /**
  * api/feedback.js
- * Vercel Serverless Function
+ * Netlify Serverless Function
  * 游戏结束时由前端调用，后端使用环境变量中的 DEEPSEEK_API_KEY 请求 DeepSeek API，
  * 根据模式、难度和游戏数据生成夸张幽默的中文评价，避免前端暴露密钥。
+ *
+ * 部署：配合根目录 netlify.toml 中的 functions = "api"，
+ *       部署后访问路径为 /.netlify/functions/feedback
  */
 
-module.exports = async (req, res) => {
+exports.handler = async (event) => {
   // 仅允许 POST 请求
-  if (req.method !== 'POST') {
-    return res.status(405).json({ feedback: '仅支持 POST 请求' });
+  if (event.httpMethod !== 'POST') {
+    return json(405, { feedback: '仅支持 POST 请求' });
   }
 
-  const { score, maxCombo, survivalTimeMs, livesLost, deathReason, mode, difficulty } = req.body || {};
+  // Netlify 的 event.body 是字符串，需手动解析 JSON
+  let body;
+  try {
+    body = JSON.parse(event.body || '{}');
+  } catch (e) {
+    return json(400, { feedback: '请求体不是有效的 JSON' });
+  }
+
+  const { score, maxCombo, survivalTimeMs, livesLost, deathReason, mode, difficulty } = body;
   if (typeof score !== 'number') {
-    return res.status(400).json({ feedback: '请求体中缺少有效的 score 字段' });
+    return json(400, { feedback: '请求体中缺少有效的 score 字段' });
   }
 
   // 从环境变量读取 DeepSeek API Key
   const apiKey = process.env.DEEPSEEK_API_KEY;
   if (!apiKey) {
-    return res.status(500).json({ feedback: '服务器未配置 DEEPSEEK_API_KEY 环境变量' });
+    return json(500, { feedback: '服务器未配置 DEEPSEEK_API_KEY 环境变量' });
   }
 
   const survivalSeconds = Math.max(0, Math.round((survivalTimeMs || 0) / 1000));
@@ -72,7 +83,7 @@ module.exports = async (req, res) => {
     });
   } catch (error) {
     console.error('调用 DeepSeek API 网络错误:', error);
-    return res.status(502).json({ feedback: 'AI裁判掉线了' });
+    return json(502, { feedback: 'AI裁判掉线了' });
   }
 
   // 步骤 2：处理 HTTP 错误状态码
@@ -86,12 +97,12 @@ module.exports = async (req, res) => {
     console.error(`DeepSeek API 返回错误: ${response.status}`, errText);
 
     if (response.status === 401) {
-      return res.status(502).json({
-        feedback: 'DeepSeek API Key 无效、过期或未开通权限，请检查 .env 中的 DEEPSEEK_API_KEY 是否正确'
+      return json(502, {
+        feedback: 'DeepSeek API Key 无效、过期或未开通权限，请检查环境变量 DEEPSEEK_API_KEY 是否正确'
       });
     }
 
-    return res.status(502).json({ feedback: 'AI裁判掉线了' });
+    return json(502, { feedback: 'AI裁判掉线了' });
   }
 
   // 步骤 3：解析响应 JSON
@@ -100,9 +111,19 @@ module.exports = async (req, res) => {
     data = await response.json();
   } catch (error) {
     console.error('解析 DeepSeek API 响应失败:', error);
-    return res.status(502).json({ feedback: 'AI裁判掉线了' });
+    return json(502, { feedback: 'AI裁判掉线了' });
   }
 
+  // 步骤 4：提取反馈文本
   const feedback = data.choices?.[0]?.message?.content || 'AI裁判掉线了';
-  return res.status(200).json({ feedback });
+  return json(200, { feedback });
 };
+
+/** 统一构造 Netlify Function 的响应格式 */
+function json(statusCode, obj) {
+  return {
+    statusCode,
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    body: JSON.stringify(obj)
+  };
+}

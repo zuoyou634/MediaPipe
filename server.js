@@ -34,7 +34,7 @@ app.use(express.static(path.join(__dirname)));
  * 根据得分、连击、存活时间等数据生成夸张幽默的中文评价
  * 错误时返回兜底文案"AI裁判掉线了"，避免前端暴露密钥
  */
-app.post('/api/feedback', async (req, res) => {
+async function handleFeedback(req, res) {
   const { score, maxCombo, survivalTimeMs, livesLost, deathReason, mode, difficulty } = req.body || {};
 
   if (typeof score !== 'number') {
@@ -133,7 +133,11 @@ app.post('/api/feedback', async (req, res) => {
   // 步骤 4：提取反馈文本
   const feedback = data.choices?.[0]?.message?.content || 'AI裁判掉线了';
   return res.status(200).json({ feedback });
-});
+}
+
+// 本地开发用 /api/feedback；Netlify 部署后前端改用 /.netlify/functions/feedback
+app.post('/api/feedback', handleFeedback);
+app.post('/.netlify/functions/feedback', handleFeedback);
 
 // 兜底路由：未匹配到的路径都返回 index.html（兼容前端路由）
 // Express 5+ 中裸通配符 * 不再合法，需要写成 /*splat

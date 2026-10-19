@@ -1,0 +1,4 @@
+# Netlify 部署配置
+[build]
+  publish = "."
+  functions = "api"
